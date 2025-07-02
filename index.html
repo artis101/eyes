@@ -62,7 +62,7 @@
         // Proximity radius - eyes only track mouse within this distance
         const proximityRadius = 500;
         const deadZoneRadius = 50;
-        const maxOffsetX = 8;
+        const maxOffsetX = 40;
         const maxOffsetY = 6;
 
         let pupilX = centerX;
@@ -72,7 +72,7 @@
         if (distanceFromPairCenter < proximityRadius) {
           // Calculate angle from individual eye to mouse (for pupil direction)
           const dx = mouseX - centerX;
-          const dy = mouseY - centerY;
+          const dy = mouseY - centerY + 75;
           const angle = Math.atan2(dy, dx);
 
           if (distanceFromPairCenter > deadZoneRadius) {
@@ -122,9 +122,10 @@
 
         // Calculate glow intensity based on distance (closer = more intense)
         const glowRadius = 50;
-        const glowIntensity = distanceFromPairCenter < glowRadius 
-          ? 1 - (distanceFromPairCenter / glowRadius)
-          : 0;
+        const glowIntensity =
+          distanceFromPairCenter < glowRadius
+            ? 1 - distanceFromPairCenter / glowRadius
+            : 0;
 
         // Draw pupil (transitions from black to red based on proximity)
         const redAmount = Math.floor(255 * glowIntensity);
