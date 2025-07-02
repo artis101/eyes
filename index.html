@@ -38,9 +38,9 @@
 
       // Eye parameters
       const eyeWidth = 60;
-      const eyeHeight = 30;
+      const eyeHeight = 45; // Increased from 30 to make the center taller
       const eyeSpacing = 80;
-      const pupilRadius = 12;
+      const pupilRadius = 25;
       const irisRadius = 8;
 
       // Track mouse movement
@@ -54,52 +54,54 @@
         const dx = mouseX - centerX;
         const dy = mouseY - centerY;
         const angle = Math.atan2(dy, dx);
-        
+
         // Calculate pupil position (constrained within eye)
         const maxOffset = 15;
         const distance = Math.min(Math.sqrt(dx * dx + dy * dy) / 10, maxOffset);
         const pupilX = centerX + Math.cos(angle) * distance;
         const pupilY = centerY + Math.sin(angle) * distance;
 
-        // Draw eyeball (white part)
+        // Draw eyeball (white part) with sharp wedge shape
         ctx.save();
-        ctx.translate(centerX, centerY);
-        ctx.scale(1, eyeHeight / eyeWidth);
-        
-        // Create gradient for realistic look
-        const gradient = ctx.createRadialGradient(0, 0, 0, 0, 0, eyeWidth);
-        gradient.addColorStop(0, '#f0f0f0');
-        gradient.addColorStop(0.7, '#e0e0e0');
-        gradient.addColorStop(1, '#cccccc');
-        
-        ctx.fillStyle = gradient;
+
+        // Solid white/light gray fill
+        ctx.fillStyle = "#e8e8e8";
         ctx.beginPath();
-        ctx.arc(0, 0, eyeWidth, 0, Math.PI * 2);
+
+        // Create wedge/almond shape with sharp corners
+        ctx.moveTo(centerX - eyeWidth, centerY);
+        ctx.quadraticCurveTo(
+          centerX,
+          centerY - eyeHeight,
+          centerX + eyeWidth,
+          centerY
+        );
+        ctx.quadraticCurveTo(
+          centerX,
+          centerY + eyeHeight,
+          centerX - eyeWidth,
+          centerY
+        );
+        ctx.closePath();
         ctx.fill();
         ctx.restore();
 
         // Draw pupil (black part)
-        ctx.fillStyle = '#000000';
+        ctx.fillStyle = "#000000";
         ctx.beginPath();
         ctx.arc(pupilX, pupilY, pupilRadius, 0, Math.PI * 2);
-        ctx.fill();
-
-        // Add subtle highlight
-        ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
-        ctx.beginPath();
-        ctx.arc(pupilX - 4, pupilY - 4, 3, 0, Math.PI * 2);
         ctx.fill();
       }
 
       function animate() {
         // Clear canvas
-        ctx.fillStyle = '#000000';
+        ctx.fillStyle = "#000000";
         ctx.fillRect(0, 0, canvas.width, canvas.height);
 
         // Draw both eyes
         const centerX = canvas.width / 2;
         const centerY = canvas.height / 2;
-        
+
         drawEye(centerX - eyeSpacing, centerY);
         drawEye(centerX + eyeSpacing, centerY);
 
