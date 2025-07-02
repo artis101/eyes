@@ -98,11 +98,8 @@
         // Draw eyeball (white part) with sharp wedge shape
         ctx.save();
 
-        // Solid white/light gray fill
-        ctx.fillStyle = "#e8e8e8";
+        // Create clipping mask for the eye shape
         ctx.beginPath();
-
-        // Create wedge/almond shape with sharp corners
         ctx.moveTo(centerX - eyeWidth, centerY);
         ctx.quadraticCurveTo(
           centerX,
@@ -117,14 +114,26 @@
           centerY
         );
         ctx.closePath();
-        ctx.fill();
-        ctx.restore();
+        ctx.clip();
 
-        // Draw pupil (black part)
-        ctx.fillStyle = "#000000";
+        // Fill the eye with solid white/light gray
+        ctx.fillStyle = "#e8e8e8";
+        ctx.fill();
+
+        // Calculate glow intensity based on distance (closer = more intense)
+        const glowRadius = 50;
+        const glowIntensity = distanceFromPairCenter < glowRadius 
+          ? 1 - (distanceFromPairCenter / glowRadius)
+          : 0;
+
+        // Draw pupil (transitions from black to red based on proximity)
+        const redAmount = Math.floor(255 * glowIntensity);
+        ctx.fillStyle = `rgb(${redAmount}, 0, 0)`;
         ctx.beginPath();
         ctx.arc(pupilX, pupilY, pupilRadius, 0, Math.PI * 2);
         ctx.fill();
+
+        ctx.restore();
       }
 
       function animate() {
