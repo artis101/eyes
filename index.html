@@ -50,12 +50,12 @@
         mouseY = e.clientY;
       });
 
-      function drawEye(centerX, centerY, screenCenterX, screenCenterY) {
-        // Calculate angle from screen center to mouse (for dead zone)
-        const dxFromCenter = mouseX - screenCenterX;
-        const dyFromCenter = mouseY - screenCenterY;
-        const distanceFromCenter = Math.sqrt(
-          dxFromCenter * dxFromCenter + dyFromCenter * dyFromCenter
+      function drawEye(centerX, centerY, pairCenterX, pairCenterY) {
+        // Calculate angle from pair center to mouse (for dead zone)
+        const dxFromPairCenter = mouseX - pairCenterX;
+        const dyFromPairCenter = mouseY - pairCenterY;
+        const distanceFromPairCenter = Math.sqrt(
+          dxFromPairCenter * dxFromPairCenter + dyFromPairCenter * dyFromPairCenter
         );
 
         // Calculate angle from individual eye to mouse (for pupil direction)
@@ -63,17 +63,17 @@
         const dy = mouseY - centerY;
         const angle = Math.atan2(dy, dx);
 
-        // Dead zone threshold - if mouse is too close to center, keep pupils centered
-        const deadZoneRadius = 100;
-        const maxOffset = 15;
+        // Dead zone threshold - if mouse is too close to pair center, keep pupils centered
+        const deadZoneRadius = 50;
+        const maxOffset = 8;
 
         let pupilX = centerX;
         let pupilY = centerY + pupilYOffset;
 
-        if (distanceFromCenter > deadZoneRadius) {
+        if (distanceFromPairCenter > deadZoneRadius) {
           // Only move pupils if mouse is outside dead zone
           const adjustedDistance = Math.min(
-            (distanceFromCenter - deadZoneRadius) / 20,
+            (distanceFromPairCenter - deadZoneRadius) / 30,
             maxOffset
           );
           pupilX = centerX + Math.cos(angle) * adjustedDistance;
@@ -117,12 +117,29 @@
         ctx.fillStyle = "#000000";
         ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-        // Draw both eyes
-        const centerX = canvas.width / 2;
-        const centerY = canvas.height / 2;
-
-        drawEye(centerX - eyeSpacing, centerY, centerX, centerY);
-        drawEye(centerX + eyeSpacing, centerY, centerX, centerY);
+        // Calculate grid dimensions
+        const pairWidth = eyeSpacing * 2 + eyeWidth * 2;
+        const pairHeight = eyeHeight * 2;
+        
+        const cols = Math.floor(canvas.width / pairWidth);
+        const rows = Math.floor(canvas.height / pairHeight);
+        
+        // Calculate starting position to center the grid
+        const totalWidth = cols * pairWidth;
+        const totalHeight = rows * pairHeight;
+        const startX = (canvas.width - totalWidth) / 2 + pairWidth / 2;
+        const startY = (canvas.height - totalHeight) / 2 + pairHeight / 2;
+        
+        // Draw grid of eye pairs
+        for (let row = 0; row < rows; row++) {
+          for (let col = 0; col < cols; col++) {
+            const pairCenterX = startX + col * pairWidth;
+            const pairCenterY = startY + row * pairHeight;
+            
+            drawEye(pairCenterX - eyeSpacing, pairCenterY, pairCenterX, pairCenterY);
+            drawEye(pairCenterX + eyeSpacing, pairCenterY, pairCenterX, pairCenterY);
+          }
+        }
 
         requestAnimationFrame(animate);
       }
