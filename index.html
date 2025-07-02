@@ -62,7 +62,8 @@
         // Proximity radius - eyes only track mouse within this distance
         const proximityRadius = 500;
         const deadZoneRadius = 50;
-        const maxOffset = 4;
+        const maxOffsetX = 8;
+        const maxOffsetY = 6;
 
         let pupilX = centerX;
         let pupilY = centerY + pupilYOffset;
@@ -78,14 +79,19 @@
             // Move pupils based on distance, with smooth falloff at proximity edge
             const proximityFactor =
               1 - distanceFromPairCenter / proximityRadius;
-            const adjustedDistance = Math.min(
+            const adjustedDistanceX = Math.min(
               ((distanceFromPairCenter - deadZoneRadius) / 10) *
                 proximityFactor,
-              maxOffset
+              maxOffsetX
             );
-            pupilX = centerX + Math.cos(angle) * adjustedDistance;
+            const adjustedDistanceY = Math.min(
+              ((distanceFromPairCenter - deadZoneRadius) / 10) *
+                proximityFactor,
+              maxOffsetY
+            );
+            pupilX = centerX + Math.cos(angle) * adjustedDistanceX;
             pupilY =
-              centerY + pupilYOffset + Math.sin(angle) * adjustedDistance;
+              centerY + pupilYOffset + Math.sin(angle) * adjustedDistanceY;
           }
         }
 
