@@ -49,17 +49,30 @@
         mouseY = e.clientY;
       });
 
-      function drawEye(centerX, centerY) {
-        // Calculate angle from eye center to mouse
+      function drawEye(centerX, centerY, screenCenterX, screenCenterY) {
+        // Calculate angle from screen center to mouse (for dead zone)
+        const dxFromCenter = mouseX - screenCenterX;
+        const dyFromCenter = mouseY - screenCenterY;
+        const distanceFromCenter = Math.sqrt(dxFromCenter * dxFromCenter + dyFromCenter * dyFromCenter);
+        
+        // Calculate angle from individual eye to mouse (for pupil direction)
         const dx = mouseX - centerX;
         const dy = mouseY - centerY;
         const angle = Math.atan2(dy, dx);
 
-        // Calculate pupil position (constrained within eye)
+        // Dead zone threshold - if mouse is too close to center, keep pupils centered
+        const deadZoneRadius = 100;
         const maxOffset = 15;
-        const distance = Math.min(Math.sqrt(dx * dx + dy * dy) / 10, maxOffset);
-        const pupilX = centerX + Math.cos(angle) * distance;
-        const pupilY = centerY + Math.sin(angle) * distance;
+        
+        let pupilX = centerX;
+        let pupilY = centerY;
+        
+        if (distanceFromCenter > deadZoneRadius) {
+          // Only move pupils if mouse is outside dead zone
+          const adjustedDistance = Math.min((distanceFromCenter - deadZoneRadius) / 20, maxOffset);
+          pupilX = centerX + Math.cos(angle) * adjustedDistance;
+          pupilY = centerY + Math.sin(angle) * adjustedDistance;
+        }
 
         // Draw eyeball (white part) with sharp wedge shape
         ctx.save();
@@ -102,8 +115,8 @@
         const centerX = canvas.width / 2;
         const centerY = canvas.height / 2;
 
-        drawEye(centerX - eyeSpacing, centerY);
-        drawEye(centerX + eyeSpacing, centerY);
+        drawEye(centerX - eyeSpacing, centerY, centerX, centerY);
+        drawEye(centerX + eyeSpacing, centerY, centerX, centerY);
 
         requestAnimationFrame(animate);
       }
