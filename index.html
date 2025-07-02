@@ -37,11 +37,12 @@
       let mouseY = canvas.height / 2;
 
       // Eye parameters
-      const eyeWidth = 60;
-      const eyeHeight = 45; // Increased from 30 to make the center taller
-      const eyeSpacing = 80;
-      const pupilRadius = 25;
+      const eyeWidth = 25;
+      const eyeHeight = 25;
+      const eyeSpacing = 35;
+      const pupilRadius = 13;
       const irisRadius = 8;
+      const pupilYOffset = -4; // Negative value moves pupils up, positive moves down
 
       // Track mouse movement
       canvas.addEventListener("mousemove", (e) => {
@@ -53,8 +54,10 @@
         // Calculate angle from screen center to mouse (for dead zone)
         const dxFromCenter = mouseX - screenCenterX;
         const dyFromCenter = mouseY - screenCenterY;
-        const distanceFromCenter = Math.sqrt(dxFromCenter * dxFromCenter + dyFromCenter * dyFromCenter);
-        
+        const distanceFromCenter = Math.sqrt(
+          dxFromCenter * dxFromCenter + dyFromCenter * dyFromCenter
+        );
+
         // Calculate angle from individual eye to mouse (for pupil direction)
         const dx = mouseX - centerX;
         const dy = mouseY - centerY;
@@ -63,15 +66,18 @@
         // Dead zone threshold - if mouse is too close to center, keep pupils centered
         const deadZoneRadius = 100;
         const maxOffset = 15;
-        
+
         let pupilX = centerX;
-        let pupilY = centerY;
-        
+        let pupilY = centerY + pupilYOffset;
+
         if (distanceFromCenter > deadZoneRadius) {
           // Only move pupils if mouse is outside dead zone
-          const adjustedDistance = Math.min((distanceFromCenter - deadZoneRadius) / 20, maxOffset);
+          const adjustedDistance = Math.min(
+            (distanceFromCenter - deadZoneRadius) / 20,
+            maxOffset
+          );
           pupilX = centerX + Math.cos(angle) * adjustedDistance;
-          pupilY = centerY + Math.sin(angle) * adjustedDistance;
+          pupilY = centerY + pupilYOffset + Math.sin(angle) * adjustedDistance;
         }
 
         // Draw eyeball (white part) with sharp wedge shape
