@@ -51,7 +51,7 @@
       });
 
       function drawEye(centerX, centerY, pairCenterX, pairCenterY) {
-        // Calculate angle from pair center to mouse (for dead zone)
+        // Calculate distance from pair center to mouse
         const dxFromPairCenter = mouseX - pairCenterX;
         const dyFromPairCenter = mouseY - pairCenterY;
         const distanceFromPairCenter = Math.sqrt(
@@ -59,26 +59,34 @@
             dyFromPairCenter * dyFromPairCenter
         );
 
-        // Calculate angle from individual eye to mouse (for pupil direction)
-        const dx = mouseX - centerX;
-        const dy = mouseY - centerY;
-        const angle = Math.atan2(dy, dx);
-
-        // Dead zone threshold - if mouse is too close to pair center, keep pupils centered
+        // Proximity radius - eyes only track mouse within this distance
+        const proximityRadius = 500;
         const deadZoneRadius = 50;
-        const maxOffset = 8;
+        const maxOffset = 4;
 
         let pupilX = centerX;
         let pupilY = centerY + pupilYOffset;
 
-        if (distanceFromPairCenter > deadZoneRadius) {
-          // Only move pupils if mouse is outside dead zone
-          const adjustedDistance = Math.min(
-            (distanceFromPairCenter - deadZoneRadius) / 30,
-            maxOffset
-          );
-          pupilX = centerX + Math.cos(angle) * adjustedDistance;
-          pupilY = centerY + pupilYOffset + Math.sin(angle) * adjustedDistance;
+        // Only track if mouse is within proximity radius
+        if (distanceFromPairCenter < proximityRadius) {
+          // Calculate angle from individual eye to mouse (for pupil direction)
+          const dx = mouseX - centerX;
+          const dy = mouseY - centerY;
+          const angle = Math.atan2(dy, dx);
+
+          if (distanceFromPairCenter > deadZoneRadius) {
+            // Move pupils based on distance, with smooth falloff at proximity edge
+            const proximityFactor =
+              1 - distanceFromPairCenter / proximityRadius;
+            const adjustedDistance = Math.min(
+              ((distanceFromPairCenter - deadZoneRadius) / 10) *
+                proximityFactor,
+              maxOffset
+            );
+            pupilX = centerX + Math.cos(angle) * adjustedDistance;
+            pupilY =
+              centerY + pupilYOffset + Math.sin(angle) * adjustedDistance;
+          }
         }
 
         // Draw eyeball (white part) with sharp wedge shape
