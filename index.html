@@ -55,7 +55,8 @@
         const dxFromPairCenter = mouseX - pairCenterX;
         const dyFromPairCenter = mouseY - pairCenterY;
         const distanceFromPairCenter = Math.sqrt(
-          dxFromPairCenter * dxFromPairCenter + dyFromPairCenter * dyFromPairCenter
+          dxFromPairCenter * dxFromPairCenter +
+            dyFromPairCenter * dyFromPairCenter
         );
 
         // Calculate angle from individual eye to mouse (for pupil direction)
@@ -117,27 +118,37 @@
         ctx.fillStyle = "#000000";
         ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-        // Calculate grid dimensions
-        const pairWidth = eyeSpacing * 2 + eyeWidth * 2;
-        const pairHeight = eyeHeight * 2;
-        
+        // Calculate grid dimensions for eye pairs
+        const pairWidth = eyeSpacing * 2 + eyeWidth * 3.5; // Total width needed for a pair
+        const pairHeight = eyeHeight * 2.5; // Total height with spacing
+
         const cols = Math.floor(canvas.width / pairWidth);
         const rows = Math.floor(canvas.height / pairHeight);
-        
+
         // Calculate starting position to center the grid
         const totalWidth = cols * pairWidth;
         const totalHeight = rows * pairHeight;
         const startX = (canvas.width - totalWidth) / 2 + pairWidth / 2;
         const startY = (canvas.height - totalHeight) / 2 + pairHeight / 2;
-        
+
         // Draw grid of eye pairs
         for (let row = 0; row < rows; row++) {
           for (let col = 0; col < cols; col++) {
             const pairCenterX = startX + col * pairWidth;
             const pairCenterY = startY + row * pairHeight;
-            
-            drawEye(pairCenterX - eyeSpacing, pairCenterY, pairCenterX, pairCenterY);
-            drawEye(pairCenterX + eyeSpacing, pairCenterY, pairCenterX, pairCenterY);
+
+            drawEye(
+              pairCenterX - eyeSpacing,
+              pairCenterY,
+              pairCenterX,
+              pairCenterY
+            );
+            drawEye(
+              pairCenterX + eyeSpacing,
+              pairCenterY,
+              pairCenterX,
+              pairCenterY
+            );
           }
         }
 
